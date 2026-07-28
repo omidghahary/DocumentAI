@@ -1,7 +1,9 @@
 import pytest
+import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from PIL import Image, ImageDraw, ImageFont
 
 @pytest.fixture
 def sample_pdf(tmp_path):
@@ -55,3 +57,12 @@ def sample_pdf_empty_page(tmp_path):
     pdf.showPage()
     pdf.save()
     return pdf_path
+
+@pytest.fixture
+def ocr_test_image(tmp_path):
+    image_path = tmp_path / "ocr_test.png"
+    image = Image.new("RGB", (400, 100), "white")
+    draw = ImageDraw.Draw(image)
+    draw.text((20, 30), "Hello OCR", fill=(0, 0, 0))
+    image.save(image_path)
+    return np.array(image)
