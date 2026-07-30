@@ -4,6 +4,6 @@ from dataclasses import dataclass, field
 class PageModel:
     page_number: int
     text: str
-    images: list[dict] = field(default_factory=list)
-    tables: list[dict] = field(default_factory=list)
+    images: list = field(default_factory=list)
+    tables: list = field(default_factory=list)
     metadata: dict = field(default_factory=dict)
