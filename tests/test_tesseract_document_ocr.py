@@ -57,3 +57,13 @@ def test_tesseract_document_ocr_empty_page(processor):
         match="has no extracted image",
         ):
         processor.extract_document_text(document)
+
+def test_tesseract_document_ocr_full_pipline(processor, sample_pdf):
+    reader = PDFReader()
+    document = reader.read(sample_pdf)
+    extractor = PyMuPDFImageExtractor()
+    document = extractor.extract_images(document)
+    result = processor.extract_document_text(document)
+    assert isinstance(result.pages[0].text, str)
+    assert result.pages[0].text != ""
+    assert "Sample PDF" in result.pages[0].text

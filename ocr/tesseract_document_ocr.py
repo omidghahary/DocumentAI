@@ -13,5 +13,5 @@ class TesseractDocumentOCR(BaseDocumentOCR):
                 raise ValueError(
                     f"Page {page.page_number} has no extracted image."
                 )
-            text = self.ocr_engine.extract_text(page.images[0])
+            page.text = self.ocr_engine.extract_text(page.images[0])
         return document
