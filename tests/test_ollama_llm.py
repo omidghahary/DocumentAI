@@ -2,6 +2,7 @@ import pytest
 from core.config import LLMConfig
 from llm.ollama_llm import OllamaLLM
 from unittest.mock import Mock, patch
+from models.llm_response_model import LLMResponseModel
 
 @pytest.fixture
 def llm_config():
@@ -54,3 +55,22 @@ def test_ollama_llm_send_request(ollama_llm):
     )
 
     assert result is fake_response
+
+def test_ollama_llm_parse_response(ollama_llm):
+
+    fake_response = Mock()
+    fake_response.json.return_value = {
+        "model": "qwen2.5:3b",
+        "message": {
+            "role": "assistant",
+            "content": "OCR is a technology for text recognition."
+        },
+        "prompt_eval_count": 25,
+        "eval_count": 40
+    }
+    result = ollama_llm._parse_response(fake_response)
+    assert isinstance(result, LLMResponseModel)
+    assert result.text == "OCR is a technology for text recognition."
+    assert result.prompt_tokens == 25
+    assert result.completion_tokens == 40
+    assert result.model == "qwen2.5:3b"

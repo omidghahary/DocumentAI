@@ -31,4 +31,10 @@ class OllamaLLM(BaseLLM):
         return response
 
     def _parse_response(self, response) -> LLMResponseModel:
-        raise NotImplementedError
+        data = response.json()
+        return LLMResponseModel(
+            text=data["message"]["content"],
+            prompt_tokens=data.get("prompt_eval_count", 0),
+            completion_tokens=data.get("eval_count", 0),
+            model=data.get("model", "")
+        )
