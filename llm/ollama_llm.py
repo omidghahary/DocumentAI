@@ -1,3 +1,4 @@
+import requests
 from llm.base_llm import BaseLLM
 from core.config import LLMConfig
 from models.llm_response_model import LLMResponseModel
@@ -21,7 +22,13 @@ class OllamaLLM(BaseLLM):
             "stream": False
         }
     def _send_request(self, payload: dict):
-        raise NotImplementedError
+        url = f"{self.config.base_url}{self.CHAT_ENDPOINT}"
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=self.config.timeout
+        )
+        return response
 
     def _parse_response(self, response) -> LLMResponseModel:
         raise NotImplementedError
