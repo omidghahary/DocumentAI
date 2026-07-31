@@ -4,3 +4,11 @@ from dataclasses import dataclass
 class OCRConfig:
     tesseract_path: str = "C:/Program Files/Tesseract-OCR/tesseract.exe"
     language: str = "fas+eng"
+
+@dataclass(frozen=True)
+class LLMConfig:
+    provider: str
+    base_url: str
+    model_name: str
+    temperature: float
+    timeout: int
