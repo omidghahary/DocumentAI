@@ -182,11 +182,98 @@ The system is composed of loosely coupled components. Each component has a singl
 | LLM Provider        | Sends prompts to the configured LLM and receives responses.  |
 | PipelineResultModel | Stores the final output of the complete processing pipeline. |
 
-## 6. Data Models
+### Design Philosophy
 
-## 7. External Dependencies
+Each component is designed around the Single Responsibility Principle (SRP).
 
-## 8. Design Principles
+Components do not communicate directly with each other.
 
-## 9. Future Extension Points
+The DocumentPipeline is the only class responsible for orchestrating the execution order.
+
+This design allows every component to be independently tested, replaced, or extended without affecting the remaining parts of the system.
+
+## 6. External Dependencies
+
+The current implementation relies on a small set of external technologies.
+
+| Dependency              | Purpose                                              |
+|-------------------------|------------------------------------------------------|
+| PyMuPDF                 | PDF parsing and image extraction.                    |
+| Tesseract OCR           | Optical Character Recognition for scanned documents. |
+| Ollama                  | Local LLM runtime for AI inference.                  |
+| Python Standard Library | Core language features and utilities.                |
+| pytest                  | Unit testing framework.                              |
+| unittest.mock           | Dependency isolation during testing.                 |
+
+The architecture intentionally isolates these dependencies behind abstraction layers. This allows individual implementations to be replaced without affecting the remaining system.
+
+Examples:
+
+- PyMuPDF may be replaced by another PDF parser.
+- Tesseract may be replaced by PaddleOCR or EasyOCR.
+- Ollama may be replaced by OpenAI, Azure OpenAI, or another LLM provider.
+
+## 7. Design Principles
+
+The architecture of DocumentAI follows a small set of design principles.
+
+### Single Responsibility Principle
+
+Each component is responsible for only one task.
+
+Examples:
+
+- OCR extracts text.
+- Chunker creates chunks.
+- PromptBuilder creates prompts.
+- LLMProvider communicates with language models.
+
+---
+
+### Loose Coupling
+
+Components communicate only through data models and interfaces.
+
+No component directly depends on the implementation details of another component.
+
+---
+
+### Dependency Injection
+
+External services are injected into the pipeline.
+
+This makes every component replaceable and easy to test.
+
+---
+
+### Testability
+
+Every processing stage should be testable in isolation.
+
+External systems such as OCR engines or LLM providers should always be mocked during unit testing.
+
+---
+
+### Extensibility
+
+The architecture should support future extensions without requiring major refactoring.
+
+Examples include:
+
+- New OCR engines
+- Additional LLM providers
+- Knowledge bases
+- Retrieval-Augmented Generation (RAG)
+- Additional document formats
+- Multimodal AI processing
+
+---
+
+### Pipeline-Oriented Design
+
+The DocumentPipeline orchestrates the execution order.
+
+Business logic remains inside individual components.
+
+The pipeline should not contain document-processing logic itself.
 
