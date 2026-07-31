@@ -67,3 +67,4 @@ def test_tesseract_document_ocr_full_pipline(processor, sample_pdf):
     assert isinstance(result.pages[0].text, str)
     assert result.pages[0].text != ""
     assert "Sample PDF" in result.pages[0].text
+    

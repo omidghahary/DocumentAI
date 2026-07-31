@@ -19,7 +19,6 @@ def test_chunk_model_fields():
             "source": "test"
         }
     )
-
     assert chunk.chunk_id == 1
     assert chunk.text == "Sample text"
     assert chunk.page_numbers == [3]

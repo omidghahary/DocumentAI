@@ -6,7 +6,7 @@ import numpy as np
 class TesseractOCR(BaseOCR):
 
     def __init__(self, config: OCRConfig):
-        self._config = config()
+        self._config = config
         pytesseract.pytesseract.tesseract_cmd = config.tesseract_path
 
     def extract_text(self, image: np.ndarray) -> str:
