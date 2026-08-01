@@ -277,3 +277,9 @@ Business logic remains inside individual components.
 
 The pipeline should not contain document-processing logic itself.
 
+
+## Summary
+
+DocumentAI is designed as a modular, extensible, and testable AI document processing framework.
+
+The current implementation focuses on PDF document analysis, while the architecture has been prepared for future AI capabilities including RAG, multimodal processing, and additional document sources.
