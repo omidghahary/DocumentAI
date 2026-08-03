@@ -92,36 +92,74 @@ from models.pipeline_result_model import PipelineResultModel
 #     ocr.extract_document_text.assert_called_once_with("document_with_images")
 #     assert result == "document_with_text"
 
-def test_document_pipeline_process_calls_chunker_after_ocr():
+# def test_document_pipeline_process_calls_chunker_after_ocr():
+#     image_extractor = Mock()
+#     ocr = Mock()
+#     chunker = Mock()
+#     prompt_builder = Mock()
+#     image_extractor.extract_images.return_value = "document_with_images"
+#     ocr.extract_document_text.return_value = "document_with_text"
+#     chunker.chunk.return_value = "fake_chunk"
+#     chunk1 = Mock()
+#     chunk2 = Mock()
+#     chunks = [chunk1, chunk2]
+#     chunker.chunk.return_value = chunks
+#     prompt_builder.build.side_effect = ["prompt1", "prompt2"]
+#     llm = Mock()
+#     llm.generate.side_effect = ["response1", "response2"]
+#     pipeline = DocumentPipeline(
+#         image_extractor=image_extractor,
+#         ocr=ocr,
+#         chunker=chunker,
+#         prompt_builder=prompt_builder,
+#         llm=llm
+#     )
+#     result = pipeline.process("document")
+#     image_extractor.extract_images.assert_called_once_with("document")
+#     ocr.extract_document_text.assert_called_once_with("document_with_images")
+#     chunker.chunk.assert_called_once_with("document_with_text")
+#     prompt_builder.build.assert_any_call(chunk1)
+#     prompt_builder.build.assert_any_call(chunk2)
+#     assert prompt_builder.build.call_count == 2
+#     assert llm.generate.call_count == 2
+#     llm.generate.assert_any_call("prompt1")
+#     llm.generate.assert_any_call("prompt2")
+#     assert isinstance(result, PipelineResultModel)
+
+def test_document_pipeline_calls_context_builder_after_chunker():
     image_extractor = Mock()
     ocr = Mock()
     chunker = Mock()
+    context_builder = Mock()
     prompt_builder = Mock()
-    image_extractor.extract_images.return_value = "document_with_images"
-    ocr.extract_document_text.return_value = "document_with_text"
-    chunker.chunk.return_value = "fake_chunk"
-    chunk1 = Mock()
-    chunk2 = Mock()
-    chunks = [chunk1, chunk2]
-    chunker.chunk.return_value = chunks
-    prompt_builder.build.side_effect = ["prompt1", "prompt2"]
     llm = Mock()
-    llm.generate.side_effect = ["response1", "response2"]
+
+    image_extractor.extract_images.return_value = "fake_images"
+    ocr.extract_document_text.return_value = "fake_text"
+    chunker.chunk.return_value = "fake_chunks"
+    context_builder.build.return_value = "fake_context"
+    prompt_builder.build.return_value = "fake_prompt"
+    llm.generate.return_value = "fake_response"
+
     pipeline = DocumentPipeline(
         image_extractor=image_extractor,
         ocr=ocr,
         chunker=chunker,
+        context_builder=context_builder,
         prompt_builder=prompt_builder,
-        llm=llm
+        llm=llm,
     )
+
     result = pipeline.process("document")
+
     image_extractor.extract_images.assert_called_once_with("document")
-    ocr.extract_document_text.assert_called_once_with("document_with_images")
-    chunker.chunk.assert_called_once_with("document_with_text")
-    prompt_builder.build.assert_any_call(chunk1)
-    prompt_builder.build.assert_any_call(chunk2)
-    assert prompt_builder.build.call_count == 2
-    assert llm.generate.call_count == 2
-    llm.generate.assert_any_call("prompt1")
-    llm.generate.assert_any_call("prompt2")
-    assert isinstance(result, PipelineResultModel)
+    ocr.extract_document_text.assert_called_once_with("fake_images")
+    chunker.chunk.assert_called_once_with("fake_text")
+    context_builder.build.assert_called_once_with("fake_chunks")
+    prompt_builder.build.assert_called_once_with("fake_context")
+    llm.generate.assert_called_once_with("fake_prompt")
+
+    assert result.chunks == "fake_chunks"
+    assert result.context == "fake_context"
+    assert result.prompt == "fake_prompt"
+    assert result.response == "fake_response"

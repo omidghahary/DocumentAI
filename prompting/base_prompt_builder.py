@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from models.chunk_model import ChunkModel
+from models.context_model import ContextModel
+from models.prompt_model import PromptModel
 
 class BasePromptBuilder(ABC):
 
     @abstractmethod
-    def build(self, chunk: ChunkModel) -> list[dict]:
-        pass
+    def build(self, context: ContextModel) -> PromptModel:
+        raise NotImplementedError

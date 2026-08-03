@@ -6,6 +6,7 @@ from ocr.base_document_ocr import BaseDocumentOCR
 from chunking.base_chunker import BaseChunker
 from prompting.base_prompt_builder import BasePromptBuilder
 from llm.base_llm import BaseLLM
+from context.base_context_builder import BaseContextBuilder
 
 class DocumentPipeline(BasePipeline):
 
@@ -14,12 +15,14 @@ class DocumentPipeline(BasePipeline):
         image_extractor: BaseImageExtractor,
         ocr: BaseDocumentOCR,
         chunker: BaseChunker,
+        context_builder: BaseContextBuilder,
         prompt_builder: BasePromptBuilder,
         llm: BaseLLM,
         ):
         self.image_extractor = image_extractor
         self.ocr = ocr
         self.chunker = chunker
+        self.context_builder = context_builder
         self.prompt_builder = prompt_builder
         self.llm = llm
         
@@ -27,17 +30,13 @@ class DocumentPipeline(BasePipeline):
         document = self.image_extractor.extract_images(document)
         document = self.ocr.extract_document_text(document)
         chunks = self.chunker.chunk(document)
-        prompts = [
-            self.prompt_builder.build(chunk)
-            for chunk in chunks
-        ]
-        responses = [
-            self.llm.generate(prompt)
-            for prompt in prompts
-        ]
+        context = self.context_builder.build(chunks)
+        prompt = self.prompt_builder.build(context)
+        response = self.llm.generate(prompt)
         return PipelineResultModel(
-            document= document,
-            chunks= chunks,
-            prompts= prompts,
-            responses= responses
+            document=document,
+            chunks=chunks,
+            context=context,
+            prompt=prompt,
+            response=response,
         )
