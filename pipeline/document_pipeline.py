@@ -7,6 +7,7 @@ from chunking.base_chunker import BaseChunker
 from prompting.base_prompt_builder import BasePromptBuilder
 from llm.base_llm import BaseLLM
 from context.base_context_builder import BaseContextBuilder
+from prompting.base_prompt_formatter import BasePromptFormatter
 
 class DocumentPipeline(BasePipeline):
 
@@ -17,6 +18,7 @@ class DocumentPipeline(BasePipeline):
         chunker: BaseChunker,
         context_builder: BaseContextBuilder,
         prompt_builder: BasePromptBuilder,
+        prompt_formatter: BasePromptFormatter,
         llm: BaseLLM,
         ):
         self.image_extractor = image_extractor
@@ -24,6 +26,7 @@ class DocumentPipeline(BasePipeline):
         self.chunker = chunker
         self.context_builder = context_builder
         self.prompt_builder = prompt_builder
+        self.prompt_formatter = prompt_formatter
         self.llm = llm
         
     def process(self, document: DocumentModel) -> PipelineResultModel:
@@ -32,7 +35,8 @@ class DocumentPipeline(BasePipeline):
         chunks = self.chunker.chunk(document)
         context = self.context_builder.build(chunks)
         prompt = self.prompt_builder.build(context)
-        response = self.llm.generate(prompt)
+        messages = self.prompt_formatter.format(prompt)
+        response = self.llm.generate(messages)
         return PipelineResultModel(
             document=document,
             chunks=chunks,
