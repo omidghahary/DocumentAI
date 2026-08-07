@@ -9,6 +9,7 @@ from llm.base_llm import BaseLLM
 from context.base_context_builder import BaseContextBuilder
 from prompting.base_prompt_formatter import BasePromptFormatter
 from chunk_selection.base_chunk_selector import BaseChunkSelector
+from chunk_scorers.base_chunk_scorer import BaseChunkScorer
 
 class DocumentPipeline(BasePipeline):
 
@@ -17,6 +18,7 @@ class DocumentPipeline(BasePipeline):
         image_extractor: BaseImageExtractor,
         ocr: BaseDocumentOCR,
         chunker: BaseChunker,
+        chunk_scorer: BaseChunkScorer,
         chunk_selector: BaseChunkSelector,
         context_builder: BaseContextBuilder,
         prompt_builder: BasePromptBuilder,
@@ -26,6 +28,7 @@ class DocumentPipeline(BasePipeline):
         self.image_extractor = image_extractor
         self.ocr = ocr
         self.chunker = chunker
+        self.chunk_scorer = chunk_scorer
         self.chunk_selector = chunk_selector
         self.context_builder = context_builder
         self.prompt_builder = prompt_builder
@@ -36,7 +39,8 @@ class DocumentPipeline(BasePipeline):
         document = self.image_extractor.extract_images(document)
         document = self.ocr.extract_document_text(document)
         chunks = self.chunker.chunk(document)
-        selected_chunks = self.chunk_selector.select(chunks)
+        scored_chunks = self.chunk_scorer.score(chunks,"")
+        selected_chunks = self.chunk_selector.select(scored_chunks)
         context = self.context_builder.build(selected_chunks)
         prompt = self.prompt_builder.build(context)
         messages = self.prompt_formatter.format(prompt)
