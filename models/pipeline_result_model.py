@@ -9,6 +9,7 @@ from models.llm_response_model import LLMResponseModel
 class PipelineResultModel:
     document: DocumentModel
     chunks: list[ChunkModel]
+    selected_chunks: list[ChunkModel]
     context: ContextModel
     prompt: PromptModel
     response: LLMResponseModel
