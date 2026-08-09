@@ -111,3 +111,23 @@ def test_keyword_chunk_scorer_normalizes_chunk_punctuation(scorer):
     )
     scored = scorer.score([chunk], "network configuration")
     assert scored[0].score == 2
+
+def test_keyword_chunk_scorer_counts_unique_keywords(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="network network network configuration",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "network configuration")
+    assert scored[0].score == 2
+
+def test_keyword_chunk_scorer_ignores_duplicate_query_keywords(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="network configuration",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "network network configuration")
+    assert scored[0].score == 2

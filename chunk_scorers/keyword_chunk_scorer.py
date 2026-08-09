@@ -9,18 +9,11 @@ class KeywordChunkScorer(BaseChunkScorer):
     """
     def score(self, chunks: list[ChunkModel], query: str) -> list[ScoredChunkModel]:
         translator = str.maketrans('', '', string.punctuation)
-        keywords = query.translate(translator).lower().split()
+        keywords = set(query.translate(translator).lower().split())
         scored_chunks = []
         for chunk in chunks:
-            text = chunk.text.translate(translator).lower().split()
-            score = sum(
-                len([
-                    word 
-                    for word in text 
-                    if word == keyword
-                    ]) 
-                for keyword in keywords
-                )
+            text = set(chunk.text.translate(translator).lower().split())
+            score = sum(1 for keyword in keywords if keyword in text)
             scored_chunks.append(
                 ScoredChunkModel(chunk=chunk, score=float(score))
             )
