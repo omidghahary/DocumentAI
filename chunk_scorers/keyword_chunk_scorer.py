@@ -1,3 +1,4 @@
+import string
 from chunk_scorers.base_chunk_scorer import BaseChunkScorer
 from models.chunk_model import ChunkModel
 from models.scored_chunk_model import ScoredChunkModel
@@ -7,7 +8,8 @@ class KeywordChunkScorer(BaseChunkScorer):
     Scores chunks based on keyword occurrence in text.
     """
     def score(self, chunks: list[ChunkModel], query: str) -> list[ScoredChunkModel]:
-        keywords = query.lower().split()
+        translator = str.maketrans('', '', string.punctuation)
+        keywords = query.translate(translator).lower().split()
         scored_chunks = []
         for chunk in chunks:
             text = chunk.text.lower()

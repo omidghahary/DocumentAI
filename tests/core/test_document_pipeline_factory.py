@@ -3,7 +3,6 @@ from core.config import RetrievalConfig
 from core.pipeline_factory import PipelineFactory
 from chunk_scorers.keyword_chunk_scorer import KeywordChunkScorer
 from chunk_selection.top_score_chunk_selector import TopScoreChunkSelector
-from core.pipeline_factory import PipelineFactory
 
 @pytest.fixture 
 def config():

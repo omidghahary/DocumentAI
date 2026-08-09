@@ -60,3 +60,24 @@ def test_keyword_chunk_scorer_empty_chunk(scorer):
     )
     scored = scorer.score([chunk], "test")
     assert scored[0].score == 0
+
+
+def test_keyword_chunk_scorer_punctuation(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="network configuration settings",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "Network, configuration!")
+    assert scored[0].score == 2
+
+def test_keyword_chunk_scorer_case_insensitive(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="Network Configuration",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "network configuration")
+    assert scored[0].score == 2
