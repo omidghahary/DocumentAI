@@ -12,8 +12,15 @@ class KeywordChunkScorer(BaseChunkScorer):
         keywords = query.translate(translator).lower().split()
         scored_chunks = []
         for chunk in chunks:
-            text = chunk.text.lower()
-            score = sum(text.count(keyword) for keyword in keywords)
+            text = chunk.text.translate(translator).lower().split()
+            score = sum(
+                len([
+                    word 
+                    for word in text 
+                    if word == keyword
+                    ]) 
+                for keyword in keywords
+                )
             scored_chunks.append(
                 ScoredChunkModel(chunk=chunk, score=float(score))
             )

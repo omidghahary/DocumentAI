@@ -81,3 +81,33 @@ def test_keyword_chunk_scorer_case_insensitive(scorer):
     )
     scored = scorer.score([chunk], "network configuration")
     assert scored[0].score == 2
+
+def test_keyword_chunk_scorer_does_not_match_partial_word(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="network configuration",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "net")
+    assert scored[0].score == 0
+
+def test_keyword_chunk_scorer_matches_complete_words(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="network configuration",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "network")
+    assert scored[0].score == 1
+
+def test_keyword_chunk_scorer_normalizes_chunk_punctuation(scorer):
+    chunk = ChunkModel(
+        chunk_id=1,
+        text="Network, configuration settings.",
+        page_numbers=1,
+        metadata={},
+    )
+    scored = scorer.score([chunk], "network configuration")
+    assert scored[0].score == 2
