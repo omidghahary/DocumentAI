@@ -12,3 +12,9 @@ class LLMConfig:
     model_name: str
     temperature: float
     timeout: int
+
+@dataclass(frozen=True)
+class RetrievalConfig:
+    chunk_scorer: str = "keyword"
+    chunk_selector: str = "top_score"
+    max_chunks: int = 5
