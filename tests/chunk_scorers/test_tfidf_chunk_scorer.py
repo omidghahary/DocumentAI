@@ -86,3 +86,54 @@ def test_tfidf_chunk_scorer_repeated_term_behavior(scorer):
     scored = scorer.score(chunks, "network")
     assert scored[1].score > scored[0].score
     assert scored[1].score > scored[2].score
+
+def test_tfidf_chunk_scorer_equal_term_frequency_same_score(scorer):
+    chunks = [
+        ChunkModel(
+            chunk_id=1,
+            text="network configuration",
+            page_numbers=1,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=2,
+            text="network configuration database server backup storage monitoring logging security",
+            page_numbers=2,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=3,
+            text="database backup",
+            page_numbers=3,
+            metadata={},
+        ),
+    ]
+    scored = scorer.score(chunks, "network configuration")
+    assert scored[0].score == pytest.approx(scored[1].score)
+
+def test_tfidf_chunk_scorer_normalized_tf_behavior(scorer):
+    chunks = [
+        ChunkModel(
+            chunk_id=1,
+            text="configuration",
+            page_numbers=1,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=2,
+            text=(
+                "configuration database server backup storage "
+                "monitoring logging security authentication"
+            ),
+            page_numbers=2,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=3,
+            text="database backup",
+            page_numbers=3,
+            metadata={},
+        ),
+    ]
+    scored = scorer.score(chunks, "configuration")
+    assert scored[0].score == pytest.approx(scored[1].score)
