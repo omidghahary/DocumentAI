@@ -2,10 +2,11 @@
 import pytest
 from chunk_scorers.keyword_chunk_scorer import KeywordChunkScorer
 from models.chunk_model import ChunkModel
+from core.text_tokenizer import TextTokenizer
 
 @pytest.fixture
 def scorer():
-    return KeywordChunkScorer()
+    return KeywordChunkScorer(TextTokenizer())
 
 def test_keyword_chunk_scorer_creation(scorer):
     assert scorer is not None

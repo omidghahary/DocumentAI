@@ -11,13 +11,14 @@ from prompting.simple_prompt_builder import SimplePromptBuilder
 from prompting.simple_prompt_formatter import SimplePromptFormatter
 from llm.mock_llm import MockLLM
 from core.config import OCRConfig
+from core.text_tokenizer import TextTokenizer
 
 class PipelineFactory:
 
     @staticmethod
     def create_chunk_scorer(config):
         if config.chunk_scorer == "keyword":
-            return KeywordChunkScorer()
+            return KeywordChunkScorer(TextTokenizer())
         return SimpleChunkScorer()
 
     @staticmethod

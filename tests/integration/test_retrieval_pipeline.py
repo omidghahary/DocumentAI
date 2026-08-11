@@ -1,6 +1,7 @@
 from chunk_scorers.keyword_chunk_scorer import KeywordChunkScorer
 from chunk_selection.top_score_chunk_selector import TopScoreChunkSelector
 from models.chunk_model import ChunkModel
+from core.text_tokenizer import TextTokenizer
 
 def test_keyword_scorer_with_top_score_selector():
     chunks = [
@@ -23,7 +24,7 @@ def test_keyword_scorer_with_top_score_selector():
             metadata={}
         ),
     ]
-    scorer = KeywordChunkScorer()
+    scorer = KeywordChunkScorer(TextTokenizer())
     selector = TopScoreChunkSelector()
     scored_chunks = scorer.score(chunks, "network configuration")
     selected_chunks = selector.select(scored_chunks)
