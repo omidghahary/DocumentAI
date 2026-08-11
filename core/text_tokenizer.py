@@ -1,7 +1,6 @@
-import string
+import re
 
 class TextTokenizer:
 
     def tokenize(self, text: str) -> list[str]:
-        translator = str.maketrans('', '', string.punctuation)
-        return text.translate(translator).lower().split()
+        return re.findall(r"\b[\w]+(?:\.[\w]+)*\b", text.lower())
