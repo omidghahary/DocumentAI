@@ -61,3 +61,28 @@ def test_tfidf_chunk_scorer_rare_term_has_higher_weight(scorer):
     assert scored[0].score == pytest.approx(math.log(3))
     assert scored[1].score == 0.0
     assert scored[2].score == 0.0
+
+def test_tfidf_chunk_scorer_repeated_term_behavior(scorer):
+    chunks = [
+        ChunkModel(
+            chunk_id=1,
+            text="network configuration",
+            page_numbers=1,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=2,
+            text="network network network",
+            page_numbers=2,
+            metadata={},
+        ),
+        ChunkModel(
+            chunk_id=3,
+            text="database backup",
+            page_numbers=3,
+            metadata={},
+        ),
+    ]
+    scored = scorer.score(chunks, "network")
+    assert scored[1].score > scored[0].score
+    assert scored[1].score > scored[2].score
