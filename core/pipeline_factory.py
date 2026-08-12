@@ -31,7 +31,10 @@ class PipelineFactory:
         if config.chunk_selector == "simple":
             return SimpleChunkSelector()
         if config.chunk_selector == "top_score":
-            return TopScoreChunkSelector(max_chunks=config.max_chunks)
+            return TopScoreChunkSelector(
+                max_chunks=config.max_chunks,
+                min_score=config.min_score,
+                )
         raise ValueError(f"Unsupported chunk selector: {config.chunk_selector}")
 
     def create_document_pipeline(self, config):

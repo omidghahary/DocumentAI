@@ -67,3 +67,22 @@ def test_document_pipeline_factory_creates_simple_chunk_selector(pipline_factory
     )
     pipeline = pipline_factory.create_document_pipeline(config)
     assert isinstance(pipeline.chunk_selector, SimpleChunkSelector)
+
+def test_document_pipeline_factory_passes_min_score_to_selector(pipline_factory):
+    config = RetrievalConfig(
+        chunk_scorer="keyword",
+        chunk_selector="top_score",
+        max_chunks=3,
+        min_score=2.5,
+    )
+    pipeline = pipline_factory.create_document_pipeline(config)
+    assert pipeline.chunk_selector._min_score == 2.5
+
+def test_document_pipeline_factory_uses_default_min_score(pipline_factory):
+    config = RetrievalConfig(
+        chunk_scorer="keyword",
+        chunk_selector="top_score",
+        max_chunks=3,
+    )
+    pipeline = pipline_factory.create_document_pipeline(config)
+    assert pipeline.chunk_selector._min_score == 0.0
