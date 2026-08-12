@@ -31,26 +31,23 @@ The system is composed of independent components where each component has a spec
 High-level data flow:
 
 User Document
-      |
-      v
+    ↓
 DocumentPipeline
-      |
-      v
+    ↓
 ImageExtractor
-      |
-      v
+    ↓
 OCR
-      |
-      v
+    ↓
 Chunker
-      |
-      v
+    ↓
+Retrieval Layer
+    ↓
+ContextBuilder
+    ↓
 PromptBuilder
-      |
-      v
+    ↓
 LLM Provider
-      |
-      v
+    ↓
 PipelineResultModel
 
 Each component can be replaced or extended independently without affecting other parts of the system.
@@ -62,39 +59,35 @@ The DocumentAI processing pipeline is responsible for transforming a user docume
 The pipeline executes a sequence of independent processing stages. Each stage receives a defined input, performs a specific operation, and produces an output that is consumed by the next stage.
 
 Current pipeline flow:
+
 DocumentModel
-     |
-     v
+    ↓
 ImageExtractor
-     |
-     v
+    ↓
 DocumentModel (with extracted images)
-     |
-     v
+    ↓
 OCR Processor
-     |
-     v
+    ↓
 DocumentModel (with extracted text)
-     |
-     v
+    ↓
 Chunker
-     |
-     v
+    ↓
 List[ChunkModel]
-     |
-     v
-PromptBuilder
-     |
-     v
+    ↓
+Retrieval Layer
+    ↓
+List[ScoredChunkModel]
+    ↓
+Selected Chunks
+    ↓
+ContextBuilder
+    ↓
 List[Prompt]
-     |
-     v
+    ↓
 LLM Provider
-     |
-     v
+    ↓
 List[LLMResponseModel]
-     |
-     v
+    ↓
 PipelineResultModel
 
 ## Pipeline Components
@@ -137,11 +130,52 @@ Input:
 Output:
 - List of ChunkModel objects.
 
-
-### 4.4 Prompt Construction
+### 4.4 Retrieval
 
 Responsibility:
-- Convert document chunks into LLM-ready prompts.
+
+* Identify the most relevant document chunks for a given query.
+* Calculate relevance scores for chunks.
+* Select the most relevant scored chunks for context construction.
+
+The Retrieval layer is composed of:
+
+* TextTokenizer
+* ChunkScorer
+* ScoredChunkModel
+* ChunkSelector
+
+Supported chunk scoring strategies:
+
+* SimpleChunkScorer
+* KeywordChunkScorer
+* TfIdfChunkScorer
+
+Supported chunk selection strategies:
+
+* SimpleChunkSelector
+* TopScoreChunkSelector
+
+TopScoreChunkSelector supports:
+
+* `min_score` — minimum score required for a chunk to be selected.
+* `max_chunks` — maximum number of chunks that can be selected.
+
+Retrieval behavior is configured through `RetrievalConfig` and constructed by `PipelineFactory`.
+
+Input:
+
+* List of ChunkModel objects
+* Query
+
+Output:
+
+* List of selected ScoredChunkModel objects
+
+### 4.5 Prompt Construction
+
+Responsibility:
+- Convert selected document chunks into LLM-ready prompts.
 - Apply prompt templates and processing instructions.
 
 Input:
@@ -151,7 +185,7 @@ Output:
 - LLM prompt messages.
 
 
-### 4.5 LLM Processing
+### 4.6 LLM Processing
 
 Responsibility:
 - Send prepared prompts to the configured Large Language Model provider.
@@ -164,7 +198,7 @@ Output:
 - LLMResponseModel
 
 
-### 4.6 Pipeline Result
+### 4.7 Pipeline Result
 
 The final output of the pipeline is a PipelineResultModel containing the processed document information, generated chunks, prompts, and LLM responses.
 
@@ -172,15 +206,22 @@ The final output of the pipeline is a PipelineResultModel containing the process
 
 The system is composed of loosely coupled components. Each component has a single responsibility and communicates with other components only through well-defined interfaces.
 
-| Component           | Responsibility                                               |
-|---------------------|--------------------------------------------------------------|
-| DocumentPipeline    | Orchestrates the complete document processing workflow.      |
-| ImageExtractor      | Extracts embedded images from document pages.                |
-| OCR Processor       | Extracts machine-readable text from document pages.          |
-| Chunker             | Splits document text into logical chunks.                    |
-| PromptBuilder       | Converts chunks into prompts suitable for LLMs.              |
-| LLM Provider        | Sends prompts to the configured LLM and receives responses.  |
-| PipelineResultModel | Stores the final output of the complete processing pipeline. |
+Component           | Responsibility
+------------------- | ----------------------------------------------------------------------
+DocumentPipeline    | Orchestrates the complete document processing workflow.
+ImageExtractor      | Extracts embedded images from document pages.
+OCR Processor       | Extracts machine-readable text from document pages.
+Chunker             | Splits document text into logical chunks.
+TextTokenizer       | Normalizes and tokenizes query and chunk text for Retrieval.
+ChunkScorer         | Calculates relevance scores for document chunks.
+ScoredChunkModel    | Associates a ChunkModel with its calculated relevance score.
+ChunkSelector       | Selects relevant scored chunks according to a selection strategy.
+RetrievalConfig     | Defines the configured Retrieval scorer, selector, and selection limits.
+PipelineFactory     | Constructs the configured Retrieval components.
+ContextBuilder      | Builds context from selected document chunks.
+PromptBuilder       | Converts selected context into prompts suitable for LLMs.
+LLM Provider        | Sends prompts to the configured LLM and receives responses.
+PipelineResultModel | Stores the final output of the complete processing pipeline.
 
 ### Design Philosophy
 
@@ -225,6 +266,10 @@ Examples:
 
 - OCR extracts text.
 - Chunker creates chunks.
+- TextTokenizer tokenizes Retrieval input.
+- ChunkScorer calculates chunk relevance.
+- ChunkSelector selects relevant chunks.
+- ContextBuilder constructs context from selected chunks.
 - PromptBuilder creates prompts.
 - LLMProvider communicates with language models.
 
@@ -275,7 +320,11 @@ The DocumentPipeline orchestrates the execution order.
 
 Business logic remains inside individual components.
 
-The pipeline should not contain document-processing logic itself.
+Retrieval strategy and component selection are configured through
+RetrievalConfig and constructed by PipelineFactory.
+
+The pipeline should not contain document-processing or Retrieval
+business logic itself.
 
 
 ## Summary

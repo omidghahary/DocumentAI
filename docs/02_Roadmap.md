@@ -53,7 +53,10 @@ Current milestone:
 
 ✔ Architecture documentation
 
-The project now has a stable software foundation and is ready to move into AI capability development.
+The project now has a stable software foundation and has entered the AI capability development stage.
+
+The current focus is improving document Retrieval, context construction,
+and reasoning quality.
 
 ## 5. Development Phases
 
@@ -76,21 +79,41 @@ Completed
 
 ---
 
-### Phase 2 — Building Intelligence
+### Phase 2 — Building Intelligence 🔄
 
 Goal
 
-Improve the quality of AI reasoning over documents.
+Improve the quality of AI reasoning over documents by improving
+context construction and document Retrieval.
 
-Main topics
+Completed
 
-- Context Builder
-- Prompt Engineering
-- Multi-document reasoning
-- Persian optimization
-- Better chunk selection
-The project should never move to the next phase before the goals of the current phase have been completed.
----
+* Context Builder foundation
+* Prompt Engineering foundation
+* TextTokenizer
+* Configurable chunk scoring
+* Keyword-based Retrieval
+* TF-IDF Retrieval
+* Configurable chunk selection
+* Top-score selection
+* Minimum score threshold
+* Top-K selection
+* Retrieval configuration through RetrievalConfig
+* Retrieval component construction through PipelineFactory
+
+Next
+
+* Multi-document Retrieval and reasoning
+* Persian-aware Retrieval optimization
+
+Future
+
+* Semantic Retrieval
+* Hybrid Retrieval
+* Retrieval quality evaluation
+
+The project should not move to the next phase before the goals of
+the current phase have been completed.
 
 ### Phase 3 — Knowledge Integration
 
@@ -130,6 +153,54 @@ Main topics
 
 Every version is organized around one primary objective.
 Additional features may be implemented only if they directly support that objective.
+
+### v0.12 — Configurable Retrieval
+
+Primary Goal
+
+Introduce configurable and testable document Retrieval.
+
+Completed
+
+* TextTokenizer
+* KeywordChunkScorer
+* TfIdfChunkScorer
+* ScoredChunkModel
+* SimpleChunkSelector
+* TopScoreChunkSelector
+* `min_score` threshold
+* `max_chunks` top-K selection
+* RetrievalConfig
+* PipelineFactory integration
+* Keyword Retrieval integration
+* TF-IDF Retrieval integration
+
+Definition of Done
+
+The system can score document chunks using configurable Retrieval
+strategies and select relevant chunks using configurable ranking,
+threshold, and top-K policies.
+
+### Next Milestone — Multi-document Retrieval
+
+Primary Goal
+
+Enable Retrieval across multiple documents while preserving
+document and chunk provenance.
+
+Key Deliverables
+
+* Multi-document chunk collection
+* Document-aware Retrieval
+* Provenance preservation
+* Retrieval across multiple documents
+* Integration with ContextBuilder
+
+Definition of Done
+
+The system can retrieve relevant chunks from multiple documents
+and construct a combined context while preserving the source
+document of each selected chunk.
 
 ### v0.8 — Context Intelligence
 
