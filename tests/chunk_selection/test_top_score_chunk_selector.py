@@ -58,3 +58,29 @@ def test_top_score_chunk_selector_output_limitaion(scored_chunks):
 def test_top_score_chunk_selector_empty_chunk(selector):
     selected_chunks = selector.select([])
     assert len(selected_chunks) == 0
+
+def test_top_score_chunk_selector_filters_by_threshold(scored_chunks):
+    selector = TopScoreChunkSelector(
+        max_chunks=3,
+        min_score=3,
+    )
+    selected_chunks = selector.select(scored_chunks)
+
+    assert len(selected_chunks) == 2
+    assert selected_chunks[0] == scored_chunks[1]
+    assert selected_chunks[1] == scored_chunks[2]
+
+def test_top_score_chunk_selector_includes_score_equal_to_min_score(scored_chunks):
+    selector = TopScoreChunkSelector(
+        max_chunks=3,
+        min_score=3,
+    )
+    selected_chunks = selector.select(scored_chunks)
+    assert any(scored_chunk.score == 3 for scored_chunk in selected_chunks)
+
+def test_top_score_chunk_selector_default_min_score_preserves_behavior(scored_chunks):
+    selector = TopScoreChunkSelector(max_chunks=2)
+    selected_chunks = selector.select(scored_chunks)
+    assert len(selected_chunks) == 2
+    assert selected_chunks[0] == scored_chunks[1]
+    assert selected_chunks[1] == scored_chunks[2]
